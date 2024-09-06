@@ -10,8 +10,8 @@ namespace ShowPass.Models
     {
         private static readonly Dictionary<Type, decimal> _prices = new Dictionary<Type, decimal>
         {
-            { Type.Camarote, 300.00m },
-            { Type.Pista, 150.00m }
+            { Type.Camarote, 500.00m },
+            { Type.Pista, 300.00m }
         };
 
         public static decimal GetPrice(this Type type)

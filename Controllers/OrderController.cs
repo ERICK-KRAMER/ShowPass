@@ -45,13 +45,13 @@ namespace ShowPass.Controllers
             }
 
             // Criação de pedido
-            Order order = new(userId, eventId, quantity, type, findEvent);
+            Order order = new(userId, eventId, quantity, type);
 
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
 
             //Criaçao do Ticket
-            Ticket ticket = new(eventId, findEvent, userId, user);
+            Ticket ticket = new(eventId, userId);
 
             await _context.Tickets.AddAsync(ticket);
             await _context.SaveChangesAsync();

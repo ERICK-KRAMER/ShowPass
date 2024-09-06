@@ -8,12 +8,10 @@ namespace ShowPass.Models
         public Guid UserId { get; set; }
         public User User { get; set; }
 
-        public Ticket(Guid eventId, Event Eevent, Guid userId, User user)
+        public Ticket(Guid eventId, Guid userId)
         {
             Id = Guid.NewGuid();
             EventId = eventId;
-            Event = Eevent;
-            User = user;
             UserId = userId;
         }
     }
