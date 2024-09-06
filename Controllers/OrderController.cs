@@ -38,6 +38,12 @@ namespace ShowPass.Controllers
             if (findEvent == null)
                 return BadRequest("Event not found!");
 
+            // verifica se o envento tem ingressos disponiveis
+            if (findEvent.MaxTicket < quantity)
+            {
+                return BadRequest("Ingressos insuficientes!");
+            }
+
             // Criação de pedido
             Order order = new()
             {
@@ -63,6 +69,9 @@ namespace ShowPass.Controllers
             };
 
             await _context.Tickets.AddAsync(ticket);
+            await _context.SaveChangesAsync();
+
+            findEvent.ChageMaxTicket(quantity);
             await _context.SaveChangesAsync();
 
             return Ok("Order created!");
