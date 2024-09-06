@@ -16,19 +16,25 @@ namespace ShowPass.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetUsers()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<object>>> GetUsers()
         {
             var users = await _context.Users
                 .Include(x => x.Tickets)
+                .Select(user => new
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Tickets = user.Tickets.Select(ticket => new
+                    {
+                        Id = ticket.Id,
+                        Event = ticket.Event.Name
+                    }).ToList()
+                })
                 .ToListAsync();
 
-            var userDtos = users.Select(user => new UserDTO(
-                user.Id,
-                user.Name,
-                user.Email
-            )).ToList();
-
-            return Ok(userDtos);
+            return Ok(users);
         }
 
         [HttpPost]
