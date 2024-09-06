@@ -8,9 +8,5 @@ namespace ShowPass.Models
         public string Password { get; set; }
         public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 
-        private User()
-        {
-
-        }
     }
 }

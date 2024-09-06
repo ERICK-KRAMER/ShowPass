@@ -9,9 +9,5 @@ namespace ShowPass.Models
         public Guid UserId { get; set; }
         public Guid EventId { get; set; }
         public Event Event { get; set; }
-        private Order()
-        {
-
-        }
     }
 }
