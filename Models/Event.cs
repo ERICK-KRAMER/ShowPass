@@ -5,6 +5,10 @@ namespace ShowPass.Models
         public Guid Id { get; init; }
         public string Name { get; set; }
         public string Location { get; set; }
-        public ICollection<Ticket> Tickets { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+        private Event()
+        {
+
+        }
     }
 }

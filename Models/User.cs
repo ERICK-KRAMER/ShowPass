@@ -6,6 +6,11 @@ namespace ShowPass.Models
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public ICollection<Ticket> Tickets { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+
+        private User()
+        {
+
+        }
     }
 }
