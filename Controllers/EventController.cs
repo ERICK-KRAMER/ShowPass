@@ -33,7 +33,7 @@ namespace ShowPass.Controllers
                 Tickets = new List<Ticket>(),
             };
 
-            var eventExist = await _context.Events.FirstOrDefaultAsync(x => x.Name == event1.Name);
+            var eventExist = await _context.Events.FirstOrDefaultAsync(x => x.Name == eventItem.Name);
 
             if (eventExist != null)
                 return BadRequest();

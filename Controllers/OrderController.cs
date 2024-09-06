@@ -22,43 +22,29 @@ namespace ShowPass.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post(Guid eventId)
+        public async Task<ActionResult> Post(Guid eventId, Guid userId, int quantity, Models.Type type)
         {
-            // Criação de usuário
-            User user = new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "ERICK",
-                Email = "ERICKKRAMER@OUTLOOK.COM",
-                Password = "123456",
-                Tickets = new List<Ticket>(),
-            };
+            // Recupera o usuario
+            var user = await _context.Users.FindAsync(userId);
 
-            var userAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Name == user.Name);
+            if (user == null)
+                return BadRequest("User not found!");
 
-            if (userAlreadyExist != null)
-            {
-                return BadRequest("User already exists.");
-            }
-
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-
-            // Criação de pedido
-
+            // Recupera o Evento
             var findEvent = await _context.Events.FirstOrDefaultAsync(
                 x => x.Id == eventId
             );
 
             if (findEvent == null)
-                return BadRequest();
+                return BadRequest("Event not found!");
 
+            // Criação de pedido
             Order order = new()
             {
                 Id = Guid.NewGuid(),
                 EventId = eventId,
-                Quantity = 1,
-                Type = 0,
+                Quantity = quantity,
+                Type = type,
                 UserId = user.Id,
                 Event = findEvent
             };

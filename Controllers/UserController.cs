@@ -22,18 +22,38 @@ namespace ShowPass.Controllers
                 .Include(x => x.Tickets)
                 .ToListAsync();
 
-            var userDtos = users.Select(user => new
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Tickets = user.Tickets.Select(ticket => new
-                {
-                    Id = ticket.Id,
-                }).ToList()
-            }).ToList();
+            var userDtos = users.Select(user => new UserDTO(
+                user.Id,
+                user.Name,
+                user.Email
+            )).ToList();
 
             return Ok(userDtos);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<User>> CreateUser(UserRequest request)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(
+                x => x.Email == request.Email
+            );
+
+            if (user != null)
+                return BadRequest("User Already Exist!");
+
+            User newUser = new()
+            {
+                Id = Guid.NewGuid(),
+                Name = request.Name,
+                Email = request.Email,
+                Password = request.Password,
+                Tickets = new List<Ticket>(),
+            };
+
+            await _context.AddAsync(newUser);
+            await _context.SaveChangesAsync();
+
+            return Ok("User Created!");
         }
     }
 }
