@@ -41,14 +41,7 @@ namespace ShowPass.Controllers
             if (user != null)
                 return BadRequest("User Already Exist!");
 
-            User newUser = new()
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                Email = request.Email,
-                Password = request.Password,
-                Tickets = new List<Ticket>(),
-            };
+            User newUser = new(request.Name, request.Email, request.Password);
 
             await _context.AddAsync(newUser);
             await _context.SaveChangesAsync();

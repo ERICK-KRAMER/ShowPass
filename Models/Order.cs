@@ -9,5 +9,15 @@ namespace ShowPass.Models
         public Guid UserId { get; set; }
         public Guid EventId { get; set; }
         public Event Event { get; set; }
+
+        public Order(Guid userId, Guid eventId, int quantity, Type type, Event Eevent)
+        {
+            Id = Guid.NewGuid();
+            EventId = eventId;
+            Quantity = quantity;
+            Type = type;
+            UserId = userId;
+            Event = Eevent;
+        }
     }
 }
