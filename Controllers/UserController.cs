@@ -1,9 +1,9 @@
-using System.Net.Mail;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShowPass.Data;
 using ShowPass.Models;
-using ShowPass.Services;
+using ShowPass.Models.EmailService;
+using ShowPass.Repositories.Interfaces;
 
 namespace ShowPass.Controllers
 {
@@ -12,8 +12,8 @@ namespace ShowPass.Controllers
     public class UserController : ControllerBase
     {
         private readonly ShowPassDbContext _context;
-        private readonly EmailService _emailService;
-        public UserController(ShowPassDbContext context, EmailService emailService)
+        private readonly IEmailService _emailService;
+        public UserController(ShowPassDbContext context, IEmailService emailService)
         {
             _context = context;
             _emailService = emailService;
@@ -53,23 +53,9 @@ namespace ShowPass.Controllers
             await _context.AddAsync(newUser);
             await _context.SaveChangesAsync();
 
-            string subject = "Bem-vindo ao ShowPass! Sua conta foi criada com sucesso.";
-            string body = $@"<html>
-                <body>
-                    <h1>Olá, {request.Name}!</h1>
-                    <p>Estamos muito felizes em tê-lo(a) no ShowPass. Sua conta foi criada com sucesso.</p>
-                    <p>Aqui estão suas informações de login:</p>
-                    <ul>
-                        <li><strong>Email:</strong> {request.Email}</li>    
-                    </ul>
-                    <p>Aproveite todas as funcionalidades que o ShowPass tem a oferecer!</p>
-                    <p>Se precisar de ajuda, entre em contato conosco.</p>
-                    <p>Atenciosamente,</p>
-                    <p>Equipe ShowPass</p>
-                </body>
-            </html>";
+            var send = new EmailPrompt().GenerateAccountCreationEmail(request.Name, request.Email);
 
-            _emailService.SendEmail(request.Email, subject, body);
+            _emailService.SendEmail(request.Email, send.Subject, send.Body);
 
             return Ok("User Created!");
         }
