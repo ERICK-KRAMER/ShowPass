@@ -10,7 +10,7 @@ namespace ShowPass.Models.EmailService
                 Body = $@"
                 <html>
                 <body>
-                    <p>Olá <strong>{userName}</strong>,</p>
+                    <h3>Olá <strong>{userName}</strong>,</h3>
 
                     <p>Obrigado por criar uma conta conosco! Estamos felizes em tê-lo(a) como parte da nossa comunidade.</p>
 
@@ -34,7 +34,7 @@ namespace ShowPass.Models.EmailService
                 Body = $@"
                 <html>
                 <body>
-                    <p>Olá <strong>{userName}</strong>,</p>
+                    <h3>Olá <strong>{userName}</strong>,</h3>
 
                     <p>Recebemos uma solicitação para redefinir sua senha. Se você fez essa solicitação, clique no link abaixo para redefinir sua senha:</p>
                     <p><a href='{recoveryLink}'>Redefinir Senha</a></p>
@@ -56,7 +56,7 @@ namespace ShowPass.Models.EmailService
                 Body = $@"
                 <html>
                 <body>
-                    <p>Olá <strong>{userName}</strong>,</p>
+                    <h3>Olá <strong>{userName}</strong>,</h3>
 
                     <p>Obrigado por sua compra! Seu pedido número <strong>{orderNumber}</strong> foi confirmado.</p>
                     <p>O valor total da compra foi de <strong>{totalPrice:C}</strong>.</p>

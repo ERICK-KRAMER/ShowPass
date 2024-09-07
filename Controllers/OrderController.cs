@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShowPass.Data;
 using ShowPass.Models;
+using ShowPass.Models.EmailService;
+using ShowPass.Repositories.Interfaces;
 
 namespace ShowPass.Controllers
 {
@@ -10,9 +12,11 @@ namespace ShowPass.Controllers
     public class OrderController : ControllerBase
     {
         private readonly ShowPassDbContext _context;
-        public OrderController(ShowPassDbContext context)
+        private readonly IEmailService _emailService;
+        public OrderController(ShowPassDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -58,6 +62,10 @@ namespace ShowPass.Controllers
 
             findEvent.ChageMaxTicket(quantity);
             await _context.SaveChangesAsync();
+
+            var send = new EmailPrompt()
+                .GeneratePurchaseConfirmationEmail(user.Name, order.Id.ToString(), order.Price);
+            _emailService.SendEmail(user.Email, send.Subject, send.Body);
 
             return Ok("Order created!");
         }
