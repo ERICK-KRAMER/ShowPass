@@ -12,9 +12,11 @@ namespace ShowPass.Controllers
     public class UserController : ControllerBase
     {
         private readonly ShowPassDbContext _context;
-        public UserController(ShowPassDbContext context)
+        private readonly EmailService _emailService;
+        public UserController(ShowPassDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -67,7 +69,7 @@ namespace ShowPass.Controllers
                 </body>
             </html>";
 
-            EmailService.SendEmail(request.Email, subject, body);
+            _emailService.SendEmail(request.Email, subject, body);
 
             return Ok("User Created!");
         }

@@ -1,9 +1,10 @@
 using System.Net;
 using System.Net.Mail;
+using ShowPass.Repositories.Interfaces;
 
 namespace ShowPass.Services
 {
-    public static class EmailService
+    public class EmailService : IEmailService
     {
         private static readonly string SmtpServer = "sandbox.smtp.mailtrap.io";
         private static readonly string Username = "944906f28912c0";
@@ -11,7 +12,7 @@ namespace ShowPass.Services
         private static readonly string FromEmail = "noreply@showpass.com";
         private static readonly int Port = 2525;
 
-        public static void SendEmail(string recipient, string subject, string body, bool isHtml = true)
+        public void SendEmail(string recipient, string subject, string body, bool isHtml = true)
         {
             try
             {
