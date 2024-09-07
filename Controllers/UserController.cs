@@ -4,6 +4,7 @@ using ShowPass.Data;
 using ShowPass.Models;
 using ShowPass.Models.EmailService;
 using ShowPass.Repositories.Interfaces;
+using ShowPass.Services;
 
 namespace ShowPass.Controllers
 {
@@ -13,10 +14,12 @@ namespace ShowPass.Controllers
     {
         private readonly ShowPassDbContext _context;
         private readonly IEmailService _emailService;
-        public UserController(ShowPassDbContext context, IEmailService emailService)
+        private readonly TokenService _tokenService;
+        public UserController(ShowPassDbContext context, IEmailService emailService, TokenService tokenService)
         {
             _context = context;
             _emailService = emailService;
+            _tokenService = tokenService;
         }
 
         [HttpGet]
@@ -52,5 +55,23 @@ namespace ShowPass.Controllers
 
             return Ok("User Created!");
         }
+
+        [HttpPost("SendToken")]
+        public async Task<ActionResult> SendTokenResetPassword(string email)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(
+                x => x.Email == email
+            ) ?? throw new Exception("User not found!");
+
+            if (user == null)
+                return BadRequest("User not found!");
+
+            var token = _tokenService.GenerateToken(user);
+            var send = new EmailPrompt().GeneratePasswordRecoveryEmail(user.Name, token);
+            _emailService.SendEmail(user.Email, send.Subject, send.Body);
+
+            return Ok("Va até o Email!");
+        }
+
     }
 }

@@ -26,7 +26,7 @@ namespace ShowPass.Models.EmailService
             };
         }
 
-        public EmailMessage GeneratePasswordRecoveryEmail(string userName, string recoveryLink)
+        public EmailMessage GeneratePasswordRecoveryEmail(string userName, string recoveryCode)
         {
             return new EmailMessage
             {
@@ -37,7 +37,7 @@ namespace ShowPass.Models.EmailService
                     <h3>Olá <strong>{userName}</strong>,</h3>
 
                     <p>Recebemos uma solicitação para redefinir sua senha. Se você fez essa solicitação, clique no link abaixo para redefinir sua senha:</p>
-                    <p><a href='{recoveryLink}'>Redefinir Senha</a></p>
+                    <p><strong>{recoveryCode}</strong></p>
 
                     <p>Se você não solicitou a redefinição de senha, desconsidere este email.</p>
 
