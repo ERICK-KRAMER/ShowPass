@@ -1,9 +1,8 @@
+using System.Net.Mail;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.Replication.PgOutput.Messages;
 using ShowPass.Data;
 using ShowPass.Models;
-using ShowPass.Models.EmailService;
 using ShowPass.Services;
 
 namespace ShowPass.Controllers
@@ -42,12 +41,10 @@ namespace ShowPass.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(UserRequest request)
         {
-            User user = await _context.Users.FirstOrDefaultAsync(
-                x => x.Email == request.Email
-            );
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
 
             if (user != null)
-                return BadRequest("User Already Exist!");
+                return BadRequest("User Already Exists!");
 
             User newUser = new(request.Name, request.Email, request.Password);
 
@@ -55,23 +52,22 @@ namespace ShowPass.Controllers
             await _context.SaveChangesAsync();
 
             string subject = "Bem-vindo ao ShowPass! Sua conta foi criada com sucesso.";
+            string body = $@"<html>
+                <body>
+                    <h1>Olá, {request.Name}!</h1>
+                    <p>Estamos muito felizes em tê-lo(a) no ShowPass. Sua conta foi criada com sucesso.</p>
+                    <p>Aqui estão suas informações de login:</p>
+                    <ul>
+                        <li><strong>Email:</strong> {request.Email}</li>    
+                    </ul>
+                    <p>Aproveite todas as funcionalidades que o ShowPass tem a oferecer!</p>
+                    <p>Se precisar de ajuda, entre em contato conosco.</p>
+                    <p>Atenciosamente,</p>
+                    <p>Equipe ShowPass</p>
+                </body>
+            </html>";
 
-            string body = $@"<h1>Olá, {request.Name}!</h1>
-                <p>Estamos muito felizes em tê-lo(a) no ShowPass. Sua conta foi criada com sucesso.</p>
-                <p>Aqui estão suas informações de login:</p>
-                <ul>
-                    <li><strong>Email:</strong> {request.Email}</li>
-                    <li><strong>Senha:</strong> (a senha que você criou)</li>
-                </ul>
-                <p>Aproveite todas as funcionalidades que o ShowPass tem a oferecer!</p>
-                <p>Se precisar de ajuda, entre em contato conosco.</p>
-                <p>Atenciosamente,</p>
-                <p>Equipe ShowPass</p>";
-
-
-            SendEmailRequest sendEmail = new(request.Email, subject, body);
-
-            EmailService.SendEmail(sendEmail.Recipient, sendEmail.Subject, sendEmail.Body);
+            EmailService.SendEmail(request.Email, subject, body);
 
             return Ok("User Created!");
         }

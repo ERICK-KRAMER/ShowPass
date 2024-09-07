@@ -5,30 +5,37 @@ namespace ShowPass.Services
 {
     public static class EmailService
     {
-        private static readonly string Sender = "YOUR_EMAIL";
-        private static readonly string Password = "YOUR_PASSWORD";
-        private static readonly string Username = "YOUR_USERNAME";
-        private static readonly string SmptServer = "SMPT_SERVER";
-        private static readonly int PortSMTP = 0; // PORT_SMTP  
+        private static readonly string SmtpServer = "sandbox.smtp.mailtrap.io";
+        private static readonly string Username = "944906f28912c0";
+        private static readonly string Password = "35065fcbecb150";
+        private static readonly string FromEmail = "noreply@showpass.com";
+        private static readonly int Port = 2525;
 
-        public static void SendEmail(string recipient, string subject, string body)
+        public static void SendEmail(string recipient, string subject, string body, bool isHtml = true)
         {
-            MailMessage message = new MailMessage(Sender, recipient, subject, body);
-
-            SmtpClient clienteSmtp = new SmtpClient(SmptServer, PortSMTP)
-            {
-                Credentials = new NetworkCredential(Username, Password),
-                EnableSsl = true
-            };
-
             try
             {
-                clienteSmtp.Send(message);
-                Console.WriteLine("E-mail enviado com sucesso!");
+                var client = new SmtpClient(SmtpServer, Port)
+                {
+                    Credentials = new NetworkCredential(Username, Password),
+                    EnableSsl = true,
+                };
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(FromEmail),
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = isHtml
+                };
+                mailMessage.To.Add(recipient);
+
+                client.Send(mailMessage);
+                Console.WriteLine("Email enviado com sucesso!");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao enviar e-mail: " + ex.Message);
+                Console.WriteLine($"Erro ao enviar email: {ex.Message}");
             }
         }
     }
