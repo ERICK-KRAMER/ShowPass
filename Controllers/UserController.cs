@@ -24,18 +24,11 @@ namespace ShowPass.Controllers
         {
             var users = await _context.Users
                 .Include(x => x.Tickets)
-                .Select(user => new
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    Email = user.Email,
-                    Tickets = user.Tickets.Select(ticket => new
-                    {
-                        Id = ticket.Id,
-                        Event = ticket.Event.Name
-                    }).ToList()
-                })
-                .ToListAsync();
+                .Select(user => new UserDTO(user.Id, user.Name, user.Email,
+                    user.Tickets.Select(
+                        ticket => new TicketDTO(ticket.Id, ticket.Event.Name
+                    )).ToList()
+            )).ToListAsync();
 
             return Ok(users);
         }
