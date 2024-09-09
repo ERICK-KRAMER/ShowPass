@@ -30,7 +30,7 @@ namespace ShowPass.Controllers
             if (eventExist != null)
                 return BadRequest();
 
-            Event event1 = new(request.Name, request.Location, request.MaxTicket, request.Date);
+            Event event1 = new(request.Name, request.Location, request.Image, request.MaxTicket, request.Date);
 
             await _context.Events.AddAsync(event1);
             await _context.SaveChangesAsync();
