@@ -15,11 +15,13 @@ namespace ShowPass.Controllers
         private readonly ShowPassDbContext _context;
         private readonly IEmailService _emailService;
         private readonly TokenService _tokenService;
-        public UserController(ShowPassDbContext context, IEmailService emailService, TokenService tokenService)
+        private readonly VerificationCodeService _verifyCodeService;
+        public UserController(ShowPassDbContext context, IEmailService emailService, TokenService tokenService, VerificationCodeService verificationCode)
         {
             _context = context;
             _emailService = emailService;
             _tokenService = tokenService;
+            _verifyCodeService = verificationCode;
         }
 
         [HttpGet]
@@ -66,11 +68,39 @@ namespace ShowPass.Controllers
             if (user == null)
                 return BadRequest("User not found!");
 
-            var token = _tokenService.GenerateToken(user);
-            var send = new EmailPrompt().GeneratePasswordRecoveryEmail(user.Name, token);
+            var code = _verifyCodeService.GenerateCode(user.Email);
+            var send = new EmailPrompt().GeneratePasswordRecoveryEmail(user.Name, code);
             _emailService.SendEmail(user.Email, send.Subject, send.Body);
 
             return Ok("Va até o Email!");
+        }
+
+        [HttpPost("UpdatePassword")]
+        public async Task<ActionResult> UpdatePassword([FromBody] UpdateUser request)
+        {
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Code) || string.IsNullOrEmpty(request.NewPassword))
+            {
+                return BadRequest("Email, code, and new password are required.");
+            }
+
+            var isValid = _verifyCodeService.ValidateCode(request.Email, request.Code);
+
+            if (!isValid)
+            {
+                return BadRequest("Token inválido!");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            user.Password = request.NewPassword;
+
+            await _context.SaveChangesAsync();
+            return Ok("Password Updated!");
         }
 
     }

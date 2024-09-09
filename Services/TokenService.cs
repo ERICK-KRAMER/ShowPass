@@ -8,7 +8,7 @@ namespace ShowPass.Services
 {
     public class TokenService
     {
-        public string GenerateToken(User user)
+        public string GenerateToken(User user, int timeInHour)
         {
             // cria uma intancia de JwtSecurityTokenHandler
             var handler = new JwtSecurityTokenHandler();
@@ -23,7 +23,7 @@ namespace ShowPass.Services
             {
                 SigningCredentials = credentials,
                 Subject = GenerateClaims(user),
-                Expires = DateTime.UtcNow.AddHours(2),
+                Expires = DateTime.UtcNow.AddHours(timeInHour),
             };
 
             // gera token 
@@ -43,6 +43,31 @@ namespace ShowPass.Services
 
             return ci;
 
+        }
+
+        public bool ValidateJwtToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(Conficuration.PrivateKey);
+
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                return true;
+
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

@@ -31,7 +31,7 @@ namespace ShowPass.Controllers
                 return Unauthorized("Invalid email or password");
 
             // Aqui você pode gerar um token JWT para o usuário
-            var token = _tokenService.GenerateToken(user);
+            var token = _tokenService.GenerateToken(user, 1);
 
             return Ok(new { token });
         }
