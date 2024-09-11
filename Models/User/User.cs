@@ -1,5 +1,3 @@
-using ShowPass.Services;
-
 namespace ShowPass.Models
 {
     public class User
@@ -15,14 +13,8 @@ namespace ShowPass.Models
             Id = Guid.NewGuid();
             Name = name;
             Email = email;
-            Password = PasswordHash(password);
+            Password = password;
             Tickets = new List<Ticket>();
-        }
-
-        public string PasswordHash(string password)
-        {
-            PasswordHashService hash = new PasswordHashService();
-            return hash.Hash(password);
         }
     }
 }

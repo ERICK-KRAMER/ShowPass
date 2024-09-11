@@ -12,11 +12,13 @@ namespace ShowPass.Controllers
     {
         private readonly TokenService _tokenService;
         private readonly ShowPassDbContext _context;
+        private readonly PasswordHashService _Bcrypt;
 
-        public LoginController(TokenService tokenService, ShowPassDbContext context)
+        public LoginController(TokenService tokenService, ShowPassDbContext context, PasswordHashService Bcrypt)
         {
             _context = context;
             _tokenService = tokenService;
+            _Bcrypt = Bcrypt;
         }
 
         [HttpPost]
@@ -27,7 +29,7 @@ namespace ShowPass.Controllers
             if (user == null)
                 return Unauthorized("Invalid email or password");
 
-            if (user.Password != loginRequest.Password)
+            if (!_Bcrypt.Verify(loginRequest.Password, user.Password))
                 return Unauthorized("Invalid email or password");
 
             // Aqui você pode gerar um token JWT para o usuário

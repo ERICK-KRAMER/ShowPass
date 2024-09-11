@@ -14,13 +14,13 @@ namespace ShowPass.Controllers
     {
         private readonly ShowPassDbContext _context;
         private readonly IEmailService _emailService;
-        private readonly TokenService _tokenService;
+        private readonly PasswordHashService _bcrypt;
         private readonly VerificationCodeService _verifyCodeService;
-        public UserController(ShowPassDbContext context, IEmailService emailService, TokenService tokenService, VerificationCodeService verificationCode)
+        public UserController(ShowPassDbContext context, IEmailService emailService, PasswordHashService bcrypt, VerificationCodeService verificationCode)
         {
             _context = context;
             _emailService = emailService;
-            _tokenService = tokenService;
+            _bcrypt = bcrypt;
             _verifyCodeService = verificationCode;
         }
 
@@ -39,23 +39,25 @@ namespace ShowPass.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(UserRequest request)
+        public async Task<ActionResult<string>> CreateUser(UserRequest request)
         {
             User user = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
 
             if (user != null)
-                return BadRequest("User Already Exists!");
+                return BadRequest("User already exists!");
 
-            User newUser = new(request.Name, request.Email, request.Password);
+            var passwordHash = _bcrypt.Hash(request.Password);
+
+            User newUser = new User(request.Name, request.Email, passwordHash);
 
             await _context.AddAsync(newUser);
             await _context.SaveChangesAsync();
 
-            var send = new EmailPrompt().GenerateAccountCreationEmail(request.Name, request.Email);
+            var emailContent = new EmailPrompt().GenerateAccountCreationEmail(request.Name, request.Email);
 
-            _emailService.SendEmail(request.Email, send.Subject, send.Body);
+            _emailService.SendEmail(request.Email, emailContent.Subject, emailContent.Body);
 
-            return Ok("User Created!");
+            return Ok("User created successfully!");
         }
 
         [HttpPost("SendToken")]

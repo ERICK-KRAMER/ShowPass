@@ -14,6 +14,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddSingleton<VerificationCodeService>();
 
+builder.Services.AddScoped<PasswordHashService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
