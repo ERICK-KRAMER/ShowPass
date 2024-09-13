@@ -1,19 +1,20 @@
-using DevOne.Security.Cryptography.BCrypt;
-
 namespace ShowPass.Services
 {
     public class PasswordHashService
     {
         public string Hash(string password)
         {
-            var salt = BCryptHelper.GenerateSalt();
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-            return BCryptHelper.HashPassword(password, salt);
+            return passwordHash;
+
         }
 
         public bool Verify(string password, string passwordHash)
         {
-            return BCryptHelper.CheckPassword(password, passwordHash);
+            bool verify = BCrypt.Net.BCrypt.Verify(password, passwordHash);
+
+            return verify;
         }
     }
 }
