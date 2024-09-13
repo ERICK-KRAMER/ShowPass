@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ShowPass.Data;
+using ShowPass.Repositories;
 using ShowPass.Repositories.Interfaces;
 using ShowPass.Services;
 
@@ -15,6 +16,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<VerificationCodeService>();
 
 builder.Services.AddScoped<PasswordHashService>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
