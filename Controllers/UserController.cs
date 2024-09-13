@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShowPass.Data;
 using ShowPass.Models;
-using ShowPass.Models.EmailService;
 using ShowPass.Repositories.Interfaces;
-using ShowPass.Services;
 
 namespace ShowPass.Controllers
 {

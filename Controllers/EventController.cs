@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShowPass.Data;
 using ShowPass.Models;
 using ShowPass.Models.Events;
+using ShowPass.Repositories.Interfaces;
 
 namespace ShowPass.Controllers
 {
@@ -10,30 +9,26 @@ namespace ShowPass.Controllers
     [Route("[controller]")]
     public class EventController : ControllerBase
     {
-        private readonly ShowPassDbContext _context;
-        public EventController(ShowPassDbContext context)
+        private readonly IEventRepository _eventRepository;
+        public EventController(IEventRepository eventRepository)
         {
-            _context = context;
+            _eventRepository = eventRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
         {
-            return await _context.Events.ToListAsync();
+            var allEvents = await _eventRepository.GetAll();
+            return Ok(allEvents);
         }
 
         [HttpPost]
         public async Task<ActionResult<Event>> PostEvent(EventDTO request)
         {
-            var eventExist = await _context.Events.FirstOrDefaultAsync(x => x.Name == request.Name);
+            var save = await _eventRepository.Save(request);
 
-            if (eventExist != null)
-                return BadRequest();
-
-            Event event1 = new(request.Name, request.Location, request.Image, request.MaxTicket, request.Date);
-
-            await _context.Events.AddAsync(event1);
-            await _context.SaveChangesAsync();
+            if (!save)
+                return BadRequest("Algo de errado acontece, tente novamente!");
 
             return Ok("Created!");
         }
@@ -41,15 +36,10 @@ namespace ShowPass.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteEvent(Guid id)
         {
-            //recupera o Evento
-            var event1 = await _context.Events.FindAsync(id);
+            var removed = await _eventRepository.Remove(id);
 
-            if (event1 == null)
-                return BadRequest("Event not found!");
-
-            //deleta o Evento
-            _context.Events.Remove(event1);
-            await _context.SaveChangesAsync();
+            if (!removed)
+                return BadRequest("Algo de errado aconteceu, tente novamente!");
 
             return Ok("Removed");
         }
