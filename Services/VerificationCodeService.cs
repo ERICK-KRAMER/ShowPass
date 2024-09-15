@@ -1,8 +1,9 @@
 using System.Collections.Concurrent;
+using ShowPass.Repositories.Interfaces;
 
 namespace ShowPass.Services
 {
-    public class VerificationCodeService
+    public class VerificationCodeService : IVerificationCodeService
     {
         private readonly ConcurrentDictionary<string, (string Code, DateTime ExpirationTime)> _codes = new();
         private readonly Random _random = new();

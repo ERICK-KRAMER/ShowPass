@@ -3,14 +3,14 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using ShowPass.Models;
+using ShowPass.Repositories.Interfaces;
 
 namespace ShowPass.Services
 {
-    public class TokenService
+    public class TokenService : ITokenService
     {
         public string GenerateToken(User user, int timeInHour)
         {
-            // cria uma intancia de JwtSecurityTokenHandler
             var handler = new JwtSecurityTokenHandler();
 
             var key = Encoding.ASCII.GetBytes(Conficuration.PrivateKey);
@@ -26,10 +26,8 @@ namespace ShowPass.Services
                 Expires = DateTime.UtcNow.AddHours(timeInHour),
             };
 
-            // gera token 
             var token = handler.CreateToken(tokenDescriptor);
 
-            // Gera uma string do token 
             var strToken = handler.WriteToken(token);
 
             return strToken;

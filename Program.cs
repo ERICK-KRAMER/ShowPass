@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ShowPassDbContext>(options
     => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddTransient<TokenService>();
+builder.Services.AddTransient<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -22,6 +22,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRespository>();
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
+
+builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

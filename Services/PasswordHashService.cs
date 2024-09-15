@@ -1,6 +1,8 @@
+using ShowPass.Repositories.Interfaces;
+
 namespace ShowPass.Services
 {
-    public class PasswordHashService
+    public class PasswordHashService : IPasswordHashService
     {
         public string Hash(string password)
         {

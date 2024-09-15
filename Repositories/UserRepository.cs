@@ -3,17 +3,16 @@ using ShowPass.Data;
 using ShowPass.Models;
 using ShowPass.Models.EmailService;
 using ShowPass.Repositories.Interfaces;
-using ShowPass.Services;
 
 namespace ShowPass.Repositories
 {
     public class UserRepository : IUserRepository
     {
         private readonly ShowPassDbContext _context;
-        private readonly VerificationCodeService _codeService;
+        private readonly IVerificationCodeService _codeService;
         private readonly IEmailService _emailService;
-        private readonly PasswordHashService _passwordHash;
-        public UserRepository(ShowPassDbContext showPassDbContext, VerificationCodeService verificationCodeService, IEmailService emailService, PasswordHashService passwordHashService)
+        private readonly IPasswordHashService _passwordHash;
+        public UserRepository(ShowPassDbContext showPassDbContext, IVerificationCodeService verificationCodeService, IEmailService emailService, IPasswordHashService passwordHashService)
         {
             _context = showPassDbContext;
             _codeService = verificationCodeService;

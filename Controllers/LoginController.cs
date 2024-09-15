@@ -1,8 +1,8 @@
 using ShowPass.Models;
 using Microsoft.AspNetCore.Mvc;
-using ShowPass.Services;
 using ShowPass.Data;
 using Microsoft.EntityFrameworkCore;
+using ShowPass.Repositories.Interfaces;
 
 namespace ShowPass.Controllers
 {
@@ -10,11 +10,11 @@ namespace ShowPass.Controllers
     [Route("[controller]")]
     public class LoginController : ControllerBase
     {
-        private readonly TokenService _tokenService;
+        private readonly ITokenService _tokenService;
         private readonly ShowPassDbContext _context;
-        private readonly PasswordHashService _Bcrypt;
+        private readonly IPasswordHashService _Bcrypt;
 
-        public LoginController(TokenService tokenService, ShowPassDbContext context, PasswordHashService Bcrypt)
+        public LoginController(ITokenService tokenService, ShowPassDbContext context, IPasswordHashService Bcrypt)
         {
             _context = context;
             _tokenService = tokenService;
