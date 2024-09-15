@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShowPass.Data;
 using ShowPass.Models;
-using ShowPass.Models.EmailService;
 using ShowPass.Repositories.Interfaces;
 
 namespace ShowPass.Controllers
@@ -11,63 +8,51 @@ namespace ShowPass.Controllers
     [Route("[controller]")]
     public class OrderController : ControllerBase
     {
-        private readonly ShowPassDbContext _context;
-        private readonly IEmailService _emailService;
-        public OrderController(ShowPassDbContext context, IEmailService emailService)
+        private readonly IOrderRepository _orderRepository;
+        public OrderController(IOrderRepository orderRepository)
         {
-            _context = context;
-            _emailService = emailService;
+            _orderRepository = orderRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            return await _context.Orders.Include(x => x.Event).ToListAsync();
+            var orders = await _orderRepository.GetAll();
+            return Ok(orders);
+        }
+
+        [HttpPost("Canceled")]
+        public async Task<ActionResult> CancelOrder(Guid id, Status status)
+        {
+            var order = await _orderRepository.Canceled(id, status);
+
+            if (!order)
+                return BadRequest("algo de errado aconteceu, tente novamente!");
+
+            return Ok("Pedido cancelado com sucesso!");
+
         }
 
         [HttpPost]
         public async Task<ActionResult> Post(Guid eventId, Guid userId, int quantity, Models.Type type)
         {
-            // Recupera o usuario
-            var user = await _context.Users.FindAsync(userId);
+            var order = await _orderRepository.Save(eventId, userId, quantity, type);
 
-            if (user == null)
-                return BadRequest("User not found!");
+            if (!order)
+                return BadRequest("Algo de errado aconteceu, tente novamente!");
 
-            // Recupera o Evento
-            var findEvent = await _context.Events.FirstOrDefaultAsync(
-                x => x.Id == eventId
-            );
+            return Ok("Order Created!");
+        }
 
-            if (findEvent == null)
-                return BadRequest("Event not found!");
+        [HttpPost("{eventId}")]
+        public async Task<ActionResult> GetOrderById(Guid eventId)
+        {
+            var order = await _orderRepository.GetAllOrderByEvent(eventId);
 
-            // verifica se o envento tem ingressos disponiveis
-            if (findEvent.MaxTicket < quantity)
-            {
-                return BadRequest("Ingressos insuficientes!");
-            }
+            if (order == null)
+                return NotFound("Order not found");
 
-            // Criação de pedido
-            Order order = new(userId, eventId, quantity, type);
-
-            await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
-
-            //Criaçao do Ticket
-            Ticket ticket = new(eventId, userId);
-
-            await _context.Tickets.AddAsync(ticket);
-            await _context.SaveChangesAsync();
-
-            findEvent.ChageMaxTicket(quantity);
-            await _context.SaveChangesAsync();
-
-            var send = new EmailPrompt()
-                .GeneratePurchaseConfirmationEmail(user.Name, order.Id.ToString(), order.Price);
-            _emailService.SendEmail(user.Email, send.Subject, send.Body);
-
-            return Ok("Order created!");
+            return Ok(order);
         }
     }
 }

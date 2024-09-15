@@ -21,6 +21,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IEventRepository, EventRespository>();
 
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
